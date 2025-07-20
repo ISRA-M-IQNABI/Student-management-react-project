@@ -5,38 +5,74 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.navbar a {
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.student-list {
+  padding: 1rem;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 1rem;
+  justify-content: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+ul {
+  list-style: none;
+  padding: 0;
+}
+li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #444;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.card {
-  padding: 2em;
+.form-page {
+  padding: 1rem;
+}
+input, select {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 300px;
 }
 
-.read-the-docs {
-  color: #888;
+button {
+  padding: 0.5rem 1rem;
+  background: #646cff;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background: #535bf2;
+}
+
+.pagination {
+  display: flex;
+  gap: 5px;
+  margin-top: 1rem;
+  justify-content: center;
+}
+.pagination button.active {
+  background: #535bf2;
+  font-weight: bold;
 }

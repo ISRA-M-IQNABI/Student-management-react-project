@@ -1,42 +1,113 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaSearch,FaEdit, FaTrashAlt  } from "react-icons/fa";
+import "./StudentList.css";
+
+const ITEMS_PER_PAGE = 5;
 
 export default function StudentList() {
   const [students, setStudents] = useState([]);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetch("http://localhost:5000/students")
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to fetch students");
-        return response.json();
-      })
-      .then((data) => setStudents(data))
-      .catch((error) => console.error(error));
+      .then((r) => r.json())
+      .then(setStudents)
+      .catch(console.error);
   }, []);
 
-  // Function to handle deleting a student
   const handleDelete = (id) => {
     fetch(`http://localhost:5000/students/${id}`, { method: "DELETE" })
-      .then(() => {
-        // Remove the deleted student from the state
-        setStudents(students.filter((student) => student.id !== id));
-      })
-      .catch((error) => console.error("Error deleting student:", error));
+      .then(() => setStudents((prev) => prev.filter((s) => s.id !== id)))
+      .catch(console.error);
   };
 
+  const filtered = students.filter((s) =>
+    s.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const sorted = sortBy
+    ? [...filtered].sort((a, b) =>
+        sortBy === "age" || sortBy === "grade"
+          ? a[sortBy] - b[sortBy]
+          : a.name.localeCompare(b.name)
+      )
+    : filtered;
+
+  const pagesCount = Math.ceil(sorted.length / ITEMS_PER_PAGE);
+  const paged = sorted.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
   return (
-    <div>
-      <h1>Student List</h1>
-      <ul>
-        {students.map((student) => (
-          <li key={student.id}>
-            <span>
-              {" "}
-              {student.name} - Age: {student.age}, Grade: {student.grade}
-            </span>
-            <button onClick={() => handleDelete(student.id)}>Delete</button>{" "}
-          </li>
+    <div className="student-list">
+      <div className="controls">
+        <div className="search-box">
+          <FaSearch className="search-icon" />
+          <input
+            placeholder="Search by name"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+          />
+        </div>
+
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="">Sort</option>
+          <option value="name">Name</option>
+          <option value="age">Age</option>
+          <option value="grade">Grade</option>
+        </select>
+      </div>
+
+     <ul>
+  {paged.map((s) => (
+    <li key={s.id}>
+      <span>{s.name}</span>
+      <span>{s.age}</span>
+      <span>{s.grade}</span>
+      <Link to={`/edit/${s.id}`}>
+        <button className="edit-btn" aria-label="Edit Student">
+          <FaEdit />
+        </button>
+      </Link>
+      <button
+        className="delete-btn"
+        onClick={() => handleDelete(s.id)}
+        aria-label="Delete Student"
+      >
+        <FaTrashAlt />
+      </button>
+    </li>
+  ))}
+</ul>
+
+
+      <div className="pagination">
+        <button style={{color:"#545353ff"}} disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+          Prev
+        </button>
+        {[...Array(pagesCount)].map((_, i) => (
+          <button
+            key={i}
+            className={page === i + 1 ? "active" : ""}
+            onClick={() => setPage(i + 1)}
+          >
+            {i + 1}
+          </button>
         ))}
-      </ul>
+        <button
+          disabled={page >= pagesCount}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

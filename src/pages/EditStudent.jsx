@@ -1,60 +1,42 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function EditStudent() {
   const { id } = useParams();
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [grade, setGrade] = useState('');
   const navigate = useNavigate();
+  const [student, setStudent] = useState({ name: "", age: "", grade: "" });
 
   useEffect(() => {
     fetch(`http://localhost:5000/students/${id}`)
-      .then(response => response.json())
-      .then(data => {
-        setName(data.name);
-        setAge(data.age);
-        setGrade(data.grade);
-      })
-      .catch(error => console.error(error));
+      .then((r) => r.json())
+      .then(setStudent)
+      .catch(console.error);
   }, [id]);
+
+  const handleChange = (e) =>
+    setStudent({ ...student, [e.target.name]: e.target.value });
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!student.name.trim()) return alert("Name is required");
     fetch(`http://localhost:5000/students/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, age: parseInt(age), grade }),
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...student, age: Number(student.age) }),
     })
-      .then(() => navigate('/'))
-      .catch(error => console.error(error));
+      .then(() => navigate("/"))
+      .catch(console.error);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Edit Student</h1>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
-        required
-      />
-      <input
-        type="number"
-        value={age}
-        onChange={(e) => setAge(e.target.value)}
-        placeholder="Age"
-        required
-      />
-      <input
-        type="text"
-        value={grade}
-        onChange={(e) => setGrade(e.target.value)}
-        placeholder="Grade"
-        required
-      />
-      <button type="submit">Save Changes</button>
-    </form>
+    <div className="form-page">
+      <h2>Edit Student</h2>
+      <form onSubmit={handleSubmit}>
+        <input name="name" value={student.name} onChange={handleChange} required />
+        <input name="age" type="number" value={student.age} onChange={handleChange} required />
+        <input name="grade" value={student.grade} onChange={handleChange} required />
+        <button type="submit">Save</button>
+      </form>
+    </div>
   );
 }
